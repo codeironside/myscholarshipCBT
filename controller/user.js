@@ -6,6 +6,11 @@ const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const express = require("express");
 
+const fs = require('fs');
+
+// Read the image file into a Buffer
+
+
 // const user = require("../models/user");
 // const student = require('../models/student')
 
@@ -34,12 +39,64 @@ const registerUser = asyncHandler(async (req, res) => {
       pass: process.env.password,
     },
   });
-  console.log(process.env.email)
+
+  const html = `
+  <!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Set the body background to the image */
+    body {
+      background-image:url('https://img.freepik.com/free-photo/front-view-stacked-books-graduation-cap-open-book-education-day_23-2149241017.jpg?w=740&t=st=1672839251~exp=1672839851~hmac=250a8619cf050e204e19f685163952c48a928f250756df0e7e70c93e889369da') ;
+      background-size: cover;
+      background-repeat: no-repeat;
+      font-family: sans-serif;
+      color: white;
+      text-align: center;
+      padding: 50px;
+    }
+
+    /* Style the header */
+    h1 {
+        color:red;
+      font-size: 48px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Style the message */
+    p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Style the button */
+    .button {
+      display: inline-block;
+      background-color: #3498db;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 18px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to My MyscholarshipNG!</h1>
+  <p>hey ${firstname} Thank you for signing up. We hope you enjoy using our app.</p>
+  <a class="button" href="#">Explore the App</a>
+</body>
+</html>
+`;
+  
   const mailOptions = {
     from: process.env.EMAIL,
     to: email,
     subject: "hurray you have signed up for the software",
-    text: `hey ${firstname} thank you for sowing interest before the exams a link would be sent to you to access the cbt portaL Lnk you are to user your email and password to sign in, further instructions would be communitcated`,
+    html:html,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
