@@ -1,0 +1,24 @@
+{
+  "name": "myscholarshipng",
+  "version": "1.0.0",
+  "description": "BE for my scholoarship NG",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codeironside/myscholarshipCBT.git"
+  },
+  "author": "oluwatobi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/codeironside/myscholarshipCBT/issues"
+  },
+  "homepage": "https://github.com/codeironside/myscholarshipCBT#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.20"
+  }
+}
