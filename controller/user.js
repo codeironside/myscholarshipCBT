@@ -1,12 +1,16 @@
-const bodyParser = require("body-parser");
-const url = require("url");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const asyncHandler = require("express-async-handler");
-const nodemailer = require("nodemailer");
-const express = require("express");
-
 const fs = require('fs');
+const url = require("url");
+const bcrypt = require("bcryptjs");
+const express = require("express");
+const jwt = require("jsonwebtoken");
+const speakeasy = require('speakeasy');
+const nodemailer = require("nodemailer");
+const bodyParser = require("body-parser");
+const asyncHandler = require("express-async-handler");
+
+
+
+
 
 // Read the image file into a Buffer
 
@@ -19,10 +23,22 @@ const fs = require('fs');
 //@access Public
 //updating mongoose with javascript?
 const registerUser = asyncHandler(async (req, res) => {
-  const { email, firstname, phonenumber, gender, lastname, password } =
+  const { Surname,
+    FirstName,
+    MiddleName,
+    email,
+    Nationality,
+    SOG,
+    SCHOOL,
+    level,
+    status,
+  essay,
+password,
+hearAbout,
+gender} =
     req.body;
   // console.log(req.body);
-  if (!firstname || !password || !email || !lastname) {
+  if (!FirstName || !password || !email || !Surname) {
     res.status(400);
     throw new Error("please add all fields");
   }
@@ -86,7 +102,7 @@ const registerUser = asyncHandler(async (req, res) => {
 </head>
 <body>
   <h1>Welcome to My MyscholarshipNG!</h1>
-  <p>hey ${firstname} Thank you for signing up. We hope you enjoy using our app.</p>
+  <p>hey ${FirstName} Thank you for signing up. We hope you enjoy using our app.</p>
   <a class="button" href="#">Explore the App</a>
 </body>
 </html>
@@ -162,7 +178,19 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
+
+const recoverPassword= asyncHandler(async(req,res)=>{
+  const secret = speakeasy.generateSecret({ length: 20 });
+  const b32= secret.base32
+
+  const base10 = parseInt(b32, 32);
+  console.log(base10); // Outputs: 42
+  
+  res.json({message:base10})
+})
+
 module.exports = {
   registerUser,
   loginUser,
+  recoverPassword
 };
