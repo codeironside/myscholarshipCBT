@@ -196,7 +196,7 @@ const recoverPassword = asyncHandler(async (req, res) => {
       auth: {
         user: process.env.email,
         pass: process.env.password,
-      },
+      },//jhbhbvjgvchchc
     });
    const html=` <!DOCTYPE html>
   <html>
