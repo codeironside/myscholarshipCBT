@@ -131,7 +131,7 @@ const registerUser = asyncHandler(async (req, res) => {
   //   username: staff.role,
 
   // }
-  // //creat user
+  // //create user
   // const User = await user.create({
   //   firstname,
   //   lastname,
@@ -178,17 +178,17 @@ const loginUser = asyncHandler(async (req, res) => {
 const time = "90s"
 
 const recoverPassword = asyncHandler(async (req, res) => {
-  const {code,email}=req.body
-  if (email && !code){
+  const { code, email } = req.body
+  if (email && !code) {
     const secret = speakeasy.generateSecret({
       length: 20,
       issuer: "MyscholarshipNG",
       name: "fury25423@gmail.com",
-      expires: time, 
+      expires: time,
     });
-  
+
     const b32 = secret.base32;
-  //conversts to base10
+    //conversts to base10
     const base10 = parseInt(b32, 32);
     console.log(base10);
     const transporter = nodemailer.createTransport({
@@ -198,7 +198,7 @@ const recoverPassword = asyncHandler(async (req, res) => {
         pass: process.env.password,
       },//jhbhbvjgvchchc
     });
-   const html=` <!DOCTYPE html>
+    const html = ` <!DOCTYPE html>
   <html>
   <head>
     <style>
@@ -267,14 +267,14 @@ const recoverPassword = asyncHandler(async (req, res) => {
   </body>
   </html>
   `;
-  
+
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
       subject: "hurray you have signed up for the software",
       html: html,
     };
-  
+
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log(error);
@@ -282,31 +282,31 @@ const recoverPassword = asyncHandler(async (req, res) => {
         console.log("Email sent: " + info.response);
       }
     });
-    
-    
+
+
   }
   //verify the code
-  if(code && !email){
-    
+  if (code && !email) {
+
     //verify the 2FA
     const base32 = BigInteger(base10).toString(32);
     console.log(base32); // Outputs: "9ix"
 
-  const verified = speakeasy.verify({
-    secret: secret.base32,
-    encoding: "base32",
-    token: code,
-  });
+    const verified = speakeasy.verify({
+      secret: secret.base32,
+      encoding: "base32",
+      token: code,
+    });
 
-  if (verified) {
-    res.status(200).json({
-      message:"verified"
-    })
-  } else {
-    res.status(401).json({
-      message:"invalid code"
-    })
-  }
+    if (verified) {
+      res.status(200).json({
+        message: "verified"
+      })
+    } else {
+      res.status(401).json({
+        message: "invalid code"
+      })
+    }
   }
 });
 
