@@ -1,11 +1,11 @@
 {
   "name": "myscholarshipng",
   "version": "1.0.0",
-  "description": "BE for my scholoarship NG",
+  "description": "Backend for my scholoarship NG CBT software",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "nodemon server.js"
+    "server": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
