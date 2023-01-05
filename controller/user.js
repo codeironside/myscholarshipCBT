@@ -1,19 +1,15 @@
-const fs = require('fs');
+const fs = require("fs");
 const url = require("url");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const speakeasy = require('speakeasy');
+const speakeasy = require("speakeasy");
 const nodemailer = require("nodemailer");
+const BigInteger = require("big-integer");
 const bodyParser = require("body-parser");
 const asyncHandler = require("express-async-handler");
 
-
-
-
-
 // Read the image file into a Buffer
-
 
 // const user = require("../models/user");
 // const student = require('../models/student')
@@ -23,7 +19,8 @@ const asyncHandler = require("express-async-handler");
 //@access Public
 //updating mongoose with javascript?
 const registerUser = asyncHandler(async (req, res) => {
-  const { Surname,
+  const {
+    Surname,
     FirstName,
     MiddleName,
     email,
@@ -32,11 +29,11 @@ const registerUser = asyncHandler(async (req, res) => {
     SCHOOL,
     level,
     status,
-  essay,
-password,
-hearAbout,
-gender} =
-    req.body;
+    essay,
+    password,
+    hearAbout,
+    gender,
+  } = req.body;
   // console.log(req.body);
   if (!FirstName || !password || !email || !Surname) {
     res.status(400);
@@ -107,12 +104,12 @@ gender} =
 </body>
 </html>
 `;
-  
+
   const mailOptions = {
     from: process.env.EMAIL,
     to: email,
     subject: "hurray you have signed up for the software",
-    html:html,
+    html: html,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -122,9 +119,9 @@ gender} =
       console.log("Email sent: " + info.response);
     }
   });
-res.status(201).json({
-  message:"email sent"
-})
+  res.status(201).json({
+    message: "email sent",
+  });
   //send a welelcome email
   //hash the password
   const salt = await bcrypt.genSalt(10);
@@ -178,19 +175,143 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
+const time = "90s"
 
-const recoverPassword= asyncHandler(async(req,res)=>{
-  const secret = speakeasy.generateSecret({ length: 20 });
-  const b32= secret.base32
-
-  const base10 = parseInt(b32, 32);
-  console.log(base10); // Outputs: 42
+const recoverPassword = asyncHandler(async (req, res) => {
+  const {code,email}=req.body
+  if (email && !code){
+    const secret = speakeasy.generateSecret({
+      length: 20,
+      issuer: "MyscholarshipNG",
+      name: "fury25423@gmail.com",
+      expires: time, 
+    });
   
-  res.json({message:base10})
-})
+    const b32 = secret.base32;
+  //conversts to base10
+    const base10 = parseInt(b32, 32);
+    console.log(base10);
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.password,
+      },
+    });
+   const html=` <!DOCTYPE html>
+  <html>
+  <head>
+    <style>
+      /* Set the body background to the image */
+      body {
+        background-image:url('https://img.freepik.com/free-photo/front-view-stacked-books-graduation-cap-open-book-education-day_23-2149241017.jpg?w=740&t=st=1672839251~exp=1672839851~hmac=250a8619cf050e204e19f685163952c48a928f250756df0e7e70c93e889369da') ;
+        background-size: cover;
+        background-repeat: no-repeat;
+        font-family: sans-serif;
+        color: white;
+        text-align: center;
+        padding: 50px;
+      }
+  
+      /* Style the header */
+      h1 {
+          color:red;
+        font-size: 48px;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+      h1 {
+        color:black;
+      font-size: 30px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+  
+      /* Style the message */
+      p {
+        font-size: 18px;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+  
+      /* Style the button */
+      .button {
+        display: inline-block;
+        background-color: #3498db;
+        color: white;
+        padding: 15px 30px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 18px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>ALERT</h1>
+    <p>Hi [USER],
+  
+    Your 2FA code is: <h2>${base10}</h2>
+    
+    This code will expire in ${time}.
+    
+    Please enter this code to verify your identity and access your account.
+    
+    
+    If you did not request this code, please contact us immediately.
+    
+    Best,
+    [YOUR NAME]
+    </p>
+    
+  </body>
+  </html>
+  `;
+  
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: "hurray you have signed up for the software",
+      html: html,
+    };
+  
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
+    
+    
+  }
+  //verify the code
+  if(code && !email){
+    
+    //verify the 2FA
+    const base32 = BigInteger(base10).toString(32);
+    console.log(base32); // Outputs: "9ix"
+
+  const verified = speakeasy.verify({
+    secret: secret.base32,
+    encoding: "base32",
+    token: code,
+  });
+
+  if (verified) {
+    res.status(200).json({
+      message:"verified"
+    })
+  } else {
+    res.status(401).json({
+      message:"invalid code"
+    })
+  }
+  }
+});
 
 module.exports = {
   registerUser,
   loginUser,
-  recoverPassword
+  recoverPassword,
 };
