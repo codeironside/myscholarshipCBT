@@ -4,12 +4,14 @@ const bcrypt = require("bcryptjs");
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const speakeasy = require("speakeasy");
+const USER = require("../models/user")
 const nodemailer = require("nodemailer");
 const BigInteger = require("big-integer");
 const bodyParser = require("body-parser");
 const asyncHandler = require("express-async-handler");
 
 // Read the image file into a Buffer
+
 
 // const user = require("../models/user");
 // const student = require('../models/student')
@@ -22,17 +24,18 @@ const registerUser = asyncHandler(async (req, res) => {
   const {
     Surname,
     FirstName,
-    MiddleName,
+    middleName,
     email,
     Nationality,
     SOG,
-    SCHOOL,
+    school,
     level,
     status,
     essay,
     password,
     hearAbout,
     gender,
+    phonenumber
   } = req.body;
   // console.log(req.body);
   if (!FirstName || !password || !email || !Surname) {
@@ -40,11 +43,13 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("please add all fields");
   }
   //check if user exist
-  //   const userExists = await User.findOne({ emaill:email });
-  //   if (userExists) {
-  //     res.status(400);
-  //     throw new Error("user already exist");
-  //   }
+    const userExists = await USER.findOne({ emaill:email });
+    if (userExists) {
+      res.status(400).json({
+        message:"user exist"
+      })
+      throw new Error("user already exist");
+    }
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -119,9 +124,7 @@ const registerUser = asyncHandler(async (req, res) => {
       console.log("Email sent: " + info.response);
     }
   });
-  res.status(201).json({
-    message: "email sent",
-  });
+ 
   //send a welelcome email
   //hash the password
   const salt = await bcrypt.genSalt(10);
@@ -132,26 +135,36 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // }
   // //create user
-  // const User = await user.create({
-  //   firstname,
-  //   lastname,
-  //   phoneNumber,
-  //   gender,
-  //   email,
-  //   password: hashedPassword,
-  // });
-  //   if (user) {
-  //     res.status(201).json({
-  //       id: User.id,
-  //       name: User.name,
-  //       email: User.email,
-  //       role:User.email,
-  //       token: generateToken(User._id),
-  //     });
-  //   } else {
-  //     res.status(400);
-  //     throw new Error("invalid data");
-  //   }
+  const User = await USER.create({
+      Surname,
+      FirstName,
+      middleName,
+      email,
+      Nationality,
+      SOG,
+      school,
+      level,
+      status,
+      essay,
+      password:hashedPassword,
+      hearAbout,
+      gender,
+      phonenumber
+  });
+    if (User) {
+      res.status(201).json({
+        id: User.id,
+        name: User.name,
+        email: User.email,
+        // token: generateToken(User._id),
+        
+          message: "email sent",
+    
+      });
+    } else {
+      res.status(400);
+      throw new Error("invalid data");
+    }
 });
 
 //@desc authenticate a User

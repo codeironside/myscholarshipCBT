@@ -1,19 +1,15 @@
-const express = require("express");
-const { errorHandler } = require("./middleware/errormiddleware.js");
 require("dotenv").config();
+const colors = require("colors")
+const express = require("express");
+const connectDB = require("./config/db.js")
+const { errorHandler } = require("./middleware/errormiddleware.js");
+
 
 
 const app = express()
 
 // db
-
-// const mongoose = require("mongoose");
-// const connectionString = process.env.MONGODB_URI;
-
-// module.exports = mongoose.connect(connectionString, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// }).then(() => console.log('you have successfully connected to mongodb database')).catch(()=> console.log('failed to connect to database'))
+connectDB()
 
 //json
 
