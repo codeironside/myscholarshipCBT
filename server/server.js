@@ -1,7 +1,7 @@
 require("dotenv").config();
 const colors = require("colors")
 const express = require("express");
-const connectDB = require("./config/db.js")
+const connectDB = require("./config/db")
 const { errorHandler } = require("./middleware/errormiddleware.js");
 
 
@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
     res.status(200).send('hompage')
 })
 
-app.use("/user", require("./routes/user"))
+app.use("/user", require("./routes/user.js"))
 
 //error handler
 app.use(errorHandler);
