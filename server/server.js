@@ -6,8 +6,14 @@ const { errorHandler } = require("./middleware/errormiddleware.js");
 
 
 
+const morgan = require('morgan');
+const logger = require('./logger');
+
+
 const app = express()
 
+//logger
+app.use(morgan('tiny', { stream: logger.stream }));
 // db
 connectDB()
 

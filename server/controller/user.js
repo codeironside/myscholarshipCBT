@@ -1,17 +1,18 @@
+const os = require("os");
 const fs = require("fs");
 const url = require("url");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const speakeasy = require("speakeasy");
-const USER = require("../models/user")
+const USER = require("../models/user");
 const nodemailer = require("nodemailer");
+const UserAgent = require("user-agents");
 const BigInteger = require("big-integer");
 const bodyParser = require("body-parser");
 const asyncHandler = require("express-async-handler");
 
 // Read the image file into a Buffer
-
 
 // const user = require("../models/user");
 // const student = require('../models/student')
@@ -35,7 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
     hearAbout,
     gender,
-    phonenumber
+    phonenumber,
   } = req.body;
   // console.log(req.body);
   if (!FirstName || !password || !email || !Surname) {
@@ -43,13 +44,14 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("please add all fields");
   }
   //check if user exist
-    const userExists = await USER.findOne({ emaill:email });
-    if (userExists) {
-      res.status(400).json({
-        message:"user exist"
-      })
-      throw new Error("user already exist");
-    }
+  const userExists = await USER.findOne({ emaill: email });
+  console.log(userExists)
+  if (userExists) {
+    res.status(400).json({
+      message: "user exist",
+    });
+    throw new Error("user already exist");
+  }
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -124,7 +126,7 @@ const registerUser = asyncHandler(async (req, res) => {
       console.log("Email sent: " + info.response);
     }
   });
- 
+
   //send a welelcome email
   //hash the password
   const salt = await bcrypt.genSalt(10);
@@ -136,35 +138,34 @@ const registerUser = asyncHandler(async (req, res) => {
   // }
   // //create user
   const User = await USER.create({
-      Surname,
-      FirstName,
-      middleName,
-      email,
-      Nationality,
-      SOG,
-      school,
-      level,
-      status,
-      essay,
-      password:hashedPassword,
-      hearAbout,
-      gender,
-      phonenumber
+    Surname,
+    FirstName,
+    middleName,
+    email,
+    Nationality,
+    SOG,
+    school,
+    level,
+    status,
+    essay,
+    password: hashedPassword,
+    hearAbout,
+    gender,
+    phonenumber,
   });
-    if (User) {
-      res.status(201).json({
-        id: User.id,
-        name: User.name,
-        email: User.email,
-        // token: generateToken(User._id),
-        
-          message: "email sent",
-    
-      });
-    } else {
-      res.status(400);
-      throw new Error("invalid data");
-    }
+  if (User) {
+    res.status(201).json({
+      id: User.id,
+      name: User.name,
+      email: User.email,
+      // token: generateToken(User._id),
+
+      message: "email sent",
+    });
+  } else {
+    res.status(400);
+    throw new Error("invalid data");
+  }
 });
 
 //@desc authenticate a User
@@ -188,11 +189,17 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
-const time = "90s"
+const time = "90s";
 
 const recoverPassword = asyncHandler(async (req, res) => {
-  const { code, email } = req.body
+  const { code, email } = req.body;
   if (email && !code) {
+    const User = await USER.findOne({email:email})
+
+    if(!User){
+      res.status(404).json({message:"not a registered user"})
+      throw new Error("invalid user")
+    }
     const secret = speakeasy.generateSecret({
       length: 20,
       issuer: "MyscholarshipNG",
@@ -209,9 +216,15 @@ const recoverPassword = asyncHandler(async (req, res) => {
       auth: {
         user: process.env.email,
         pass: process.env.password,
-      },//jhbhbvjgvchchc
+      }, //jhbhbvjgvchchc
     });
+    const userAgent = new UserAgent();
+    const rowser = JSON.stringify(userAgent.data, null, 1);
+   
+    const currentDate = new Date();
+    const gmtDate = currentDate.toGMTString();
     const html = ` <!DOCTYPE html>
+
   <html>
   <head>
     <style>
@@ -262,19 +275,34 @@ const recoverPassword = asyncHandler(async (req, res) => {
   </head>
   <body>
     <h1>ALERT</h1>
-    <p>Hi [USER],
-  
-    Your 2FA code is: <h2>${base10}</h2>
+    <p>Hi ,
+    We received a request to reset the password on your myscholarship Account.<br/>
     
-    This code will expire in ${time}.
+    <h2>${base10}</h2>
+    Enter this code to complete the reset.<br/>
     
-    Please enter this code to verify your identity and access your account.
+    Thanks for helping us keep your account secure.<br/>
     
+    The myscholarship Team<br/>
     
-    If you did not request this code, please contact us immediately.
+    When and where this happened<br/>
+    Date:<br/>
+    ${gmtDate}}<br/>
+    Operating System:<br/>
     
-    Best,
-    [YOUR NAME]
+    ${os.type()}<br/>
+    
+    Browser:<br/>
+    
+    ${userAgent.appName}<br/>
+    
+    Approximate Location:<br/>
+    
+    Abuja, Abuja (fct), Nigeria<br/>
+    
+    Didn't do this? Be sure to change your password right away.<br/>
+    
+    This email was intended for ${User.FirstName} ${User.middleName}<br/>
     </p>
     
   </body>
@@ -284,7 +312,7 @@ const recoverPassword = asyncHandler(async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: "hurray you have signed up for the software",
+      subject: `${User.Surname}, here's your PIN`,
       html: html,
     };
 
@@ -295,12 +323,9 @@ const recoverPassword = asyncHandler(async (req, res) => {
         console.log("Email sent: " + info.response);
       }
     });
-
-
   }
   //verify the code
   if (code && !email) {
-
     //verify the 2FA
     const base32 = BigInteger(base10).toString(32);
     console.log(base32); // Outputs: "9ix"
@@ -313,12 +338,12 @@ const recoverPassword = asyncHandler(async (req, res) => {
 
     if (verified) {
       res.status(200).json({
-        message: "verified"
-      })
+        message: "verified",
+      });
     } else {
       res.status(401).json({
-        message: "invalid code"
-      })
+        message: "invalid code",
+      });
     }
   }
 });
