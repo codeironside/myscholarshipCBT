@@ -25,6 +25,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
+    "express-http-context": "^1.2.4",
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^4.13.0",
     "mongoose": "^6.8.2",
@@ -33,6 +34,7 @@
     "nodemon": "^2.0.20",
     "speakeasy": "^2.0.0",
     "user-agents": "^1.0.1252",
+    "uuid": "^9.0.0",
     "winston": "^3.1.0",
     "winston-daily-rotate-file": "^3.5.1"
   }

@@ -1,0 +1,4 @@
+2023-01-07 21:01:41[errormiddleware.js] error: "400 - Bad Request - please add all fields - /user/registration - POST - ::1"
+2023-01-07 21:01:41[errormiddleware.js] info: "POST /user/registration 400 1206 - 40.948 ms\n"
+2023-01-07 21:48:54[user.js] error: "400 - Bad Request - please add all fields - /user/registration - POST - ::1-undefined"
+2023-01-07 21:48:54[user.js] info: "POST /user/registration 400 1206 - 74.439 ms\n"

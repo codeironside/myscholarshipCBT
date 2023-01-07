@@ -1,10 +1,10 @@
-const { createLogger, format, transports } = require('winston');
+const { createLogger, format,errors, transports } = require('winston');
 require('winston-daily-rotate-file');
 const fs = require('fs');
 const path = require('path');
 
 const env = process.env.NODE_ENV || 'development';
-const logDir = 'log';
+const logDir = 'userlog';
 const datePatternConfiguration = {
   default: 'YYYY-MM-DD',
   everHour: 'YYYY-MM-DD-HH',
@@ -18,15 +18,16 @@ if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
 
+
 const dailyRotateFileTransport = new transports.DailyRotateFile({
-  filename: `${logDir}/%DATE%-results.log`,
+  filename: `${logDir}/users.log`,
   datePattern: datePatternConfiguration.everHour,
   zippedArchive: true,
   maxSize: `${fileSizeToRotate}m`,
   maxFiles: `${numberOfDaysToKeepLog}d`
 });
 
-const logger = createLogger({
+const userlogger = createLogger({
   // change level if in dev environment versus production
   level: env === 'development' ? 'verbose' : 'info',
   handleExceptions: true,
@@ -52,11 +53,16 @@ const logger = createLogger({
     dailyRotateFileTransport,
   ],
 });
+;
 
-logger.stream = {
+userlogger.stream = {
   write: (message) => {
-    logger.info(message);
+    userlogger.info(message);
   },
 };
-
-module.exports = logger;
+// userlogger.stream = {
+//   write: (message) => {
+//     userlogger.info(message);
+//   },
+// };
+module.exports = userlogger;

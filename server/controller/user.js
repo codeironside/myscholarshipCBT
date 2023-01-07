@@ -4,6 +4,7 @@ const url = require("url");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const userlogger = require("../utils/userloger")
 const speakeasy = require("speakeasy");
 const USER = require("../models/user");
 const nodemailer = require("nodemailer");
@@ -11,6 +12,7 @@ const UserAgent = require("user-agents");
 const BigInteger = require("big-integer");
 const bodyParser = require("body-parser");
 const asyncHandler = require("express-async-handler");
+
 
 // Read the image file into a Buffer
 
@@ -22,6 +24,7 @@ const asyncHandler = require("express-async-handler");
 //@access Public
 //updating mongoose with javascript?
 const registerUser = asyncHandler(async (req, res) => {
+  
   const {
     Surname,
     FirstName,
@@ -42,12 +45,12 @@ const registerUser = asyncHandler(async (req, res) => {
   if (!FirstName || !password || !email || !Surname) {
     res.status(400);
     throw new Error("please add all fields");
+
   }
   //check if user exist
   const userExists = await USER.findOne({ emaill: email });
-  console.log(userExists)
   if (userExists) {
-    res.status(400).json({
+    res.statusCode(400).json({
       message: "user exist",
     });
     throw new Error("user already exist");
@@ -121,9 +124,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
+      res.statusCode(400)
       console.log(error);
+      throw new Error(error)
     } else {
       console.log("Email sent: " + info.response);
+      userlogger.info("Email sent: " + info.response + `200 - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}-${req.id}`)
     }
   });
 
@@ -162,9 +168,11 @@ const registerUser = asyncHandler(async (req, res) => {
 
       message: "email sent",
     });
+    userlogger.info("user created" + `202 - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
   } else {
-    res.status(400);
+    res.statusCode(400);
     throw new Error("invalid data");
+
   }
 });
 
