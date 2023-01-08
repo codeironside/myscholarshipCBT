@@ -1,4 +1,4 @@
-const { createLogger, format,errors, transports } = require('winston');
+const { createLogger, format,error, transports } = require('winston');
 require('winston-daily-rotate-file');
 const fs = require('fs');
 const path = require('path');
@@ -20,8 +20,8 @@ if (!fs.existsSync(logDir)) {
 
 
 const dailyRotateFileTransport = new transports.DailyRotateFile({
-  filename: `${logDir}/users.log`,
-  datePattern: datePatternConfiguration.everHour,
+  filename: `${logDir}/%DATE%-users.log`,
+  datePattern: "12h",
   zippedArchive: true,
   maxSize: `${fileSizeToRotate}m`,
   maxFiles: `${numberOfDaysToKeepLog}d`

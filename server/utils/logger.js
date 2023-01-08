@@ -19,8 +19,8 @@ if (!fs.existsSync(logDir)) {
 }
 
 const dailyRotateFileTransport = new transports.DailyRotateFile({
-  filename: `${logDir}/server.log`,
-  datePattern: datePatternConfiguration.everHour,
+  filename: `${logDir}/%DATE%server.log`,
+  datePattern: "12h",
   zippedArchive: true,
   maxSize: `${fileSizeToRotate}m`,
   maxFiles: `${numberOfDaysToKeepLog}d`

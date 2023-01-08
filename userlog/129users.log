@@ -1,0 +1,4 @@
+2023-01-08 21:11:30[user.js] error: "201 - Created - secretOrPrivateKey must have a value - /user/registration - POST - ::1"
+2023-01-08 21:11:30[user.js] info: "POST /user/registration 201 446 - 12209.917 ms\n"
+2023-01-08 21:41:42[user.js] info: "POST /user/registration 201 251 - 4444.963 ms\n"
+2023-01-08 21:51:51[user.js] info: "POST /user/registration 201 251 - 419.396 ms\n"
