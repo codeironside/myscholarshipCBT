@@ -127,7 +127,7 @@ const registerUser = asyncHandler(async (req, res) => {
       throw new Error("email not sent")
     } else {
       console.log("Email sent: " + info.response);
-      // userlogger.info("Email sent: " + `- ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
+      userlogger.info(`Email sent :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`)
     }
   });
 
@@ -162,7 +162,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
       // message: "email sent",
     });
-    userlogger.info(" user created" + `- ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
+    userlogger.info(`user created :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}`)
   } else {
     res.status(400);
     throw new Error("invalid data");
@@ -309,7 +309,7 @@ const loginUser = asyncHandler(async (req, res) => {
       } else {
         console.log("Email sent: " + info.response);
         res.status(202).json({message:"please check your email for your code"})
-        userlogger.info(`202 - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
+        userlogger.info(`202 - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`)
       }
     });
   } else {
@@ -479,7 +479,8 @@ const recoverPassword = asyncHandler(async (req, res) => {
       } else {
         console.log("Email sent: " + info.response);
         res.status(202).json({message:"please check your email for your code"})
-        userlogger.info("email sent" + `202 - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
+        console.log(req.originalUrl)
+        userlogger.info(`email sent :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}`)
       }
     });
   
