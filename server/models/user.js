@@ -57,6 +57,10 @@ const USER = mongoose.Schema(
       type:String,
       required: [true, "please insert password"],
     },
+    score: {
+      type:String,
+      required: [true, "please insert password"],
+    },
   },
 
   {

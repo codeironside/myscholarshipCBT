@@ -67,3 +67,5 @@
 2023-01-08 20:56:19[db.js] info: "Server started and running on http://development:2000"
 2023-01-08 20:56:20[db.js] info: "database started and running on http://localhost"
 2023-01-08 20:56:28[db.js] info: "POST /user/registration 400 197 - 196.634 ms\n"
+2023-01-09 08:18:52[db.js] info: "Server started and running on http://development:2000"
+2023-01-09 08:18:52[db.js] info: "database started and running on http://localhost"
