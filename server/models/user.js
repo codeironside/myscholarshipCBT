@@ -55,11 +55,10 @@ const USER = mongoose.Schema(
     },
     school: {
       type:String,
-      required: [true, "please insert password"],
+      required: [true, "please insert a school"],
     },
     score: {
-      type:String,
-      required: [true, "please insert password"],
+      type:String
     },
   },
 

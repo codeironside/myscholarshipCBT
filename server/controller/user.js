@@ -135,7 +135,7 @@ const registerUser = asyncHandler(async (req, res) => {
   //hash the password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
- 
+ console.log(hashedPassword)
   // //create user
   const User = await USER.create({
     Surname,
@@ -226,7 +226,7 @@ const loginUser = asyncHandler(async (req, res) => {
         margin-bottom: 20px;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
-      h1 {
+      h2 {
         color:black;
       font-size: 30px;
       margin-bottom: 20px;
@@ -258,10 +258,13 @@ const loginUser = asyncHandler(async (req, res) => {
     <p>Hi ${User.FirstName}</p> ,
         
 
-    We are sending this email to confirm that you are the owner of the account associated with this email address. </br>
+    We are sending this email to confirm that you are the owner of the account associated with this email address.</br>
+    
+    
+    </br>
     To complete the 2FA verification process, please enter the following code on the verification page:</br>
 
-      ${base10}
+     <h2> ${base10}</h2>
 
     If you did not request 2FA verification or have any issues with the process, please contact our support team for assistance.
 
@@ -308,7 +311,7 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new Error(error)
       } else {
         console.log("Email sent: " + info.response);
-        res.status(202).json({message:"please check your email for your code"})
+        res.status(202).json({message:"please check your email for your code"}).redirect("https://web.facebook.com/")
         userlogger.info(`202 - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`)
       }
     });
@@ -403,7 +406,7 @@ const recoverPassword = asyncHandler(async (req, res) => {
         margin-bottom: 20px;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
-      h1 {
+      h2 {
         color:black;
       font-size: 30px;
       margin-bottom: 20px;
