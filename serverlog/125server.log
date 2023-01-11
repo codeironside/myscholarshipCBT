@@ -63,3 +63,7 @@
 2023-01-11 17:24:17[db.js] info: "database started and running on http://localhost"
 2023-01-11 17:24:49[db.js] info: "Server started and running on http://development:2000"
 2023-01-11 17:24:49[db.js] info: "database started and running on http://localhost"
+2023-01-11 17:25:00[db.js] info: "Server started and running on http://development:2000"
+2023-01-11 17:25:00[db.js] info: "database started and running on http://localhost"
+2023-01-11 17:25:07[db.js] info: "POST /user/changePassword 202 22 - 312.667 ms\n"
+2023-01-11 17:25:22[db.js] info: "POST /user/changePassword 202 22 - 254.949 ms\n"
