@@ -60,6 +60,9 @@ const USER = mongoose.Schema(
     score: {
       type:String
     },
+    secret:{
+      type:String
+    }
   },
 
   {

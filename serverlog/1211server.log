@@ -1,3 +1,4 @@
 2023-01-08 23:34:13[db.js] info: "Server started and running on http://development:2000"
 2023-01-08 23:34:13[db.js] info: "database started and running on http://localhost"
 2023-01-10 23:01:38[db.js] info: "POST /user/login 202 51 - 2431.033 ms\n"
+2023-01-10 23:02:02[db.js] info: "POST /user/authenticate 200 1216 - 7.327 ms\n"

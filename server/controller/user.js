@@ -4,7 +4,7 @@ const url = require("url");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const userlogger = require("../utils/userloger")
+const userlogger = require("../utils/userloger");
 const speakeasy = require("speakeasy");
 const USER = require("../models/user");
 const nodemailer = require("nodemailer");
@@ -12,7 +12,7 @@ const UserAgent = require("user-agents");
 const BigInteger = require("big-integer");
 const bodyParser = require("body-parser");
 const asyncHandler = require("express-async-handler");
-
+const { findOneAndUpdate } = require("../models/user");
 
 // Read the image file into a Buffer
 
@@ -24,7 +24,6 @@ const asyncHandler = require("express-async-handler");
 //@access Public
 //updating mongoose with javascript?
 const registerUser = asyncHandler(async (req, res) => {
-  
   const {
     Surname,
     FirstName,
@@ -41,16 +40,21 @@ const registerUser = asyncHandler(async (req, res) => {
     gender,
     phonenumber,
   } = req.body;
+  const secret = speakeasy.generateSecret({
+    length: 20,
+    issuer: "MyscholarshipNG",
+    name: email,
+  });
+
   // console.log(req.body);
   if (!FirstName || !password || !email || !Surname) {
     res.status(400);
     throw new Error("please add all fields");
-
   }
   //check if user exist
   const userExists = await USER.findOne({ email });
   if (userExists) {
-    res.status(400)
+    res.status(400);
     throw new Error("user already exist");
   }
   const transporter = nodemailer.createTransport({
@@ -122,12 +126,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      res.status(400)
+      res.status(400);
       console.log(error);
-      throw new Error("email not sent")
+      throw new Error("email not sent");
     } else {
       console.log("Email sent: " + info.response);
-      userlogger.info(`Email sent :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`)
+      userlogger.info(
+        `Email sent :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`
+      );
     }
   });
 
@@ -135,7 +141,7 @@ const registerUser = asyncHandler(async (req, res) => {
   //hash the password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
- console.log(hashedPassword)
+  console.log(hashedPassword);
   // //create user
   const User = await USER.create({
     Surname,
@@ -152,6 +158,7 @@ const registerUser = asyncHandler(async (req, res) => {
     hearAbout,
     gender,
     phonenumber,
+    secret: secret.base32,
   });
   if (User) {
     res.status(201).json({
@@ -162,11 +169,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
       // message: "email sent",
     });
-    userlogger.info(`user created :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}`)
+    userlogger.info(
+      `user created :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}`
+    );
   } else {
     res.status(400);
     throw new Error("invalid data");
-
   }
 });
 
@@ -176,21 +184,17 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   //check for staff number
-  time="60s"
-  const User = await USER.findOne({ email: email });
-  
-  if (User && bcrypt.compare(password, User.password)) {
-    const secret = speakeasy.generateSecret({
-      length: 20,
-      issuer: "MyscholarshipNG",
-      name: "fury25423@gmail.com",
-      expires: time,
-    });
 
-    const b32 = secret.base32;
-    //conversts to base10
-    const base10 = parseInt(b32, 32);
-    console.log(base10);
+  const User = await USER.findOne({ email: email });
+  const secret = User.secret;
+  console.log(secret);
+  if (User && bcrypt.compare(password, User.password)) {
+    var token = speakeasy.totp({
+      secret: secret,
+      encoding: "base32",
+    });
+    console.log(token);
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -199,8 +203,7 @@ const loginUser = asyncHandler(async (req, res) => {
       }, //jhbhbvjgvchchc
     });
     const userAgent = new UserAgent();
-    
-   
+
     const currentDate = new Date();
     const gmtDate = currentDate.toGMTString();
     const html = ` <!DOCTYPE html>
@@ -264,7 +267,7 @@ const loginUser = asyncHandler(async (req, res) => {
     </br>
     To complete the 2FA verification process, please enter the following code on the verification page:</br>
 
-     <h2> ${base10}</h2>
+     <h2> ${token}</h2>
 
     If you did not request 2FA verification or have any issues with the process, please contact our support team for assistance.
 
@@ -308,11 +311,15 @@ const loginUser = asyncHandler(async (req, res) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log(error);
-        throw new Error(error)
+        throw new Error(error);
       } else {
         console.log("Email sent: " + info.response);
-        res.status(202).json({message:"please check your email for your code"}).redirect("https://web.facebook.com/")
-        userlogger.info(`202 - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`)
+        res
+          .status(202)
+          .json({ message: "please check your email for your code" });
+        userlogger.info(
+          `email sent: 202 - ${res.statusMessage} - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`
+        );
       }
     });
   } else {
@@ -323,67 +330,58 @@ const loginUser = asyncHandler(async (req, res) => {
 //@desc authenticate login
 //@routes GET/user/verifycode
 //@access public
-const authenticatelogin =asyncHandler(async(req,res)=>{
-
-  const {code}= req.body
-  const base32 = BigInteger(code).toString(32);
-    console.log(base32); // Outputs: "9ix"
-
-    const verified = speakeasy.verify({
-      secret: secret.base32,
-      encoding: "base32",
-      token: base32,
-  
-    })
-    if (verified) {
-      res.status(200).json({
-        message: "verified",
-      });
-      userlogger.info("user verified" + `202 - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`)
-    } else {
-      res.status(401)
-      throw new Error("invalid code")
-    }
-
-  
-      
-})
-
-
-
+const authenticatelogin = asyncHandler(async (req, res) => {
+  const { code, email } = req.body;
+  const User = await USER.findOne({ email: email });
+  var verified = speakeasy.totp.verify({
+    secret: User.secret,
+    encoding: "base32",
+    token: code,
+    window: 6,
+  }); // Outputs: "9ix"
+  console.log(verified);
+  if (verified) {
+    res.status(200).json({
+      verify: "verified",
+    });
+    userlogger.info(
+      `user verified :202 - ${res.statusMessage} - ${req.originalUrl} - ${req.method} - ${req.ip}`
+    );
+  } else {
+    res.status(401);
+    throw new Error("invalid code");
+  }
+});
+//@desc recover password
+//@routes POST /user/recoverPassword
+//@access public
 const recoverPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
- 
-    const User = await USER.findOne({email:email})
-    const time = "90s";
-    if(!User){
-      res.status(404)
-      throw new Error("invalid user")
-    }
-    const secret = speakeasy.generateSecret({
-      length: 20,
-      issuer: "MyscholarshipNG",
-      name: "fury25423@gmail.com",
-      expires: time,
-    });
 
-    const b32 = secret.base32;
-    //conversts to base10
-    const base10 = parseInt(b32, 32);
-    console.log(base10);
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.email,
-        pass: process.env.password,
-      }, //jhbhbvjgvchchc
-    });
-    const userAgent = new UserAgent();
-    const rowser = JSON.stringify(userAgent.data, null, 1);
-   
-    const currentDate = new Date();
-    const gmtDate = currentDate.toGMTString();
-    const html = ` <!DOCTYPE html>
+  const User = await USER.findOne({ email: email });
+  if (!User) {
+    res.status(404);
+    throw new Error("invalid user");
+  }
+  var token = speakeasy.totp({
+    secret: User.secret,
+    encoding: "base32",
+  });
+  console.log(token);
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.email,
+      pass: process.env.password,
+    }, //jhbhbvjgvchchc
+  });
+  const userAgent = new UserAgent();
+  const rowser = JSON.stringify(userAgent.data, null, 1);
+
+  const currentDate = new Date();
+  const gmtDate = currentDate.toGMTString();
+  const html = ` <!DOCTYPE html>
 
   <html>
   <head>
@@ -438,7 +436,7 @@ const recoverPassword = asyncHandler(async (req, res) => {
     <p>Hi ,
     We received a request to reset the password on your myscholarship Account.<br/>
     
-    <h2>${base10}</h2>
+    <h2>${token}</h2>
     Enter this code to complete the reset.<br/>
     
     Thanks for helping us keep your account secure.<br/>
@@ -469,59 +467,90 @@ const recoverPassword = asyncHandler(async (req, res) => {
   </html>
   `;
 
-    const mailOptions = {
-      from: process.env.EMAIL,
-      to: email,
-      subject: `${User.Surname}, here's your PIN`,
-      html: html,
-    };
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: `${User.Surname}, here's your PIN`,
+    html: html,
+  };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent: " + info.response);
-        res.status(202).json({message:"please check your email for your code"})
-        console.log(req.originalUrl)
-        userlogger.info(`email sent :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}`)
-      }
-    });
-  
- 
-    
-  }
-);
-const verifycode=asyncHandler(async(req,res)=>{
-  const {code}= req.body
-  const base32 = BigInteger(code).toString(32);
-    console.log(base32); // Outputs: "9ix"
-
-    const verified = speakeasy.verify({
-      secret: secret.base32,
-      encoding: "base32",
-      token: base32,
-  
-    })
-    if (verified) {
-      res.status(200).json({
-        message: "verified",
-      });
-      userlogger("2fa code verified")
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
     } else {
-      res.status(401)
-      throw new Error("invalid code")
+      console.log("Email sent: " + info.response);
+      res
+        .status(202)
+        .json({ message: "please check your email for your code" });
+      console.log(req.originalUrl);
+      userlogger.info(
+        `email sent :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}`
+      );
     }
-})
+  });
+});
 
+//@desc verify code for recover password
+//@routes POST/user/verifycode
+//@access public
+const verifycode = asyncHandler(async (req, res) => {
+  const { code, email } = req.body;
+  const User = await USER.findOne({ email: email });
+  var verified = speakeasy.totp.verify({
+    secret: User.secret,
+    encoding: "base32",
+    token: code,
+    window: 6,
+  }); // Outputs: "9ix"
+  console.log(verified);
+  // put with mongoose ?
+  if (verified) {
+    res.status(200).json({
+      verify: "verified",
+    });
+    userlogger.info(
+      `user verified :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}`
+    );
+  } else {
+    res.status(401);
+    throw new Error("invalid code");
+  }
+});
 
+//@descchange password
+//@routes POST/user/changepassword
+//@access public
 
+const changepassword = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  const id= await USER.findOne({email:email})
+  const change = await USER.findByIdAndUpdate(
+    id._id,
+    { password: hashedPassword },
+    { new: true }
+  );
+  console.log(change)
+
+  if (change) {
+    res.status(202).json({
+      password: "changed",
+    });
+    userlogger.info(
+      `password changed :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}`
+    );
+  } else{ res.status(401);
+  throw new Error("unable to change password")};
+});
 const generateToken = (id) => {
-  return jwt.sign({ id}, process.env.JWT_SECRET, { expiresIn: "1d" });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 };
 module.exports = {
   registerUser,
   loginUser,
   recoverPassword,
   verifycode,
-  authenticatelogin
+  authenticatelogin,
+  changepassword,
 };
