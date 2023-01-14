@@ -19,50 +19,53 @@ const USER = mongoose.Schema(
     email: {
       type: String,
       required: [true, "specify an email"],
-      unique:true
+      unique: true,
     },
     phonenumber: {
       type: String,
       required: [true, "specify include phonenumber"],
     },
     password: {
-      type:String,
+      type: String,
       required: [true, "please insert password"],
     },
     essay: {
-      type:String,
+      type: String,
       required: [true, "please insert an essay"],
     },
     SOG: {
-      type:String,
+      type: String,
       required: [true, "please insert an SOG"],
     },
     level: {
-      type:String,
+      type: String,
       required: [true, "please include level"],
     },
     status: {
-      type:String,
+      type: String,
       required: [true, "please state a staus"],
     },
     Nationality: {
-      type:String,
+      type: String,
       required: [true, "please indicate a nationality"],
     },
     hearAbout: {
-      type:String,
+      type: String,
       required: [true, "please pick one"],
     },
     school: {
-      type:String,
+      type: String,
       required: [true, "please insert a school"],
     },
     score: {
-      type:String
+      type: String,
     },
-    secret:{
-      type:String
-    }
+    secret: {
+      type: String,
+    },
+    sessionStorage: {
+      type: String,
+    },
   },
 
   {

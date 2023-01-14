@@ -4,15 +4,15 @@ const url = require("url");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const userlogger = require("../utils/userloger");
 const speakeasy = require("speakeasy");
 const USER = require("../models/user");
 const nodemailer = require("nodemailer");
 const UserAgent = require("user-agents");
 const BigInteger = require("big-integer");
 const bodyParser = require("body-parser");
+const { IPinfoWrapper } = require("node-ipinfo");
+const userlogger = require("../utils/userloger");
 const asyncHandler = require("express-async-handler");
-const { findOneAndUpdate } = require("../models/user");
 
 // Read the image file into a Buffer
 
@@ -132,7 +132,7 @@ const registerUser = asyncHandler(async (req, res) => {
     } else {
       console.log("Email sent: " + info.response);
       userlogger.info(
-        `Email sent :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`
+        `Email sent : to ${email}  250 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`
       );
     }
   });
@@ -182,6 +182,9 @@ const registerUser = asyncHandler(async (req, res) => {
 //@routes GET/user/login
 //@access Public
 const loginUser = asyncHandler(async (req, res) => {
+  if (req.session.userid) {
+    res.redirect("user/exams");
+  }
   const { email, password } = req.body;
   //check for staff number
 
@@ -279,7 +282,8 @@ const loginUser = asyncHandler(async (req, res) => {
     
     When and where this happened<br/>
     Date:<br/>
-    ${gmtDate}}<br/>
+    ${gmtDate}}br/>
+    
     Operating System:<br/>
     
     ${os.type()}<br/>
@@ -314,11 +318,26 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new Error(error);
       } else {
         console.log("Email sent: " + info.response);
-        res
-          .status(202)
-          .json({ message: "please check your email for your code" });
+        res.status(202).json({
+          message: "please check your email for your code",
+          token: generateToken(User._id),
+        });
+        const userloc = req.ipInfo;
+        const ipinfo = new IPinfoWrapper(process.env.ipsecret);
+
+         console.log(ipinfo.lookupIp(userloc).then((data) => {
+          return data
+        }));
+
+       
+        console.log(`User IP: ${userloc}`);
+
         userlogger.info(
-          `email sent: 202 - ${res.statusMessage} - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`
+          `email sent: to ${email} 202 - ${res.statusMessage} - ${
+            req.originalUrl
+          } - ${req.method} - ${req.ip}-${
+            info.response
+          }-- request made from os:${os.type()}, browser: ${userAgent.appName}`
         );
       }
     });
@@ -525,13 +544,13 @@ const changepassword = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  const id= await USER.findOne({email:email})
+  const id = await USER.findOne({ email: email });
   const change = await USER.findByIdAndUpdate(
     id._id,
     { password: hashedPassword },
     { new: true }
   );
-  console.log(change)
+  console.log(change);
 
   if (change) {
     res.status(202).json({
@@ -540,11 +559,20 @@ const changepassword = asyncHandler(async (req, res) => {
     userlogger.info(
       `password changed :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}`
     );
-  } else{ res.status(401);
-  throw new Error("unable to change password")};
+  } else {
+    res.status(401);
+    throw new Error("unable to change password");
+  }
 });
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+};
+const Location = (userloc) => {
+  const ipinfo = new IPinfoWrapper(process.env.ipsecret);
+
+  ipinfo.lookupIp(userIp).then((response) => {
+    return console.log(response);
+  });
 };
 module.exports = {
   registerUser,
