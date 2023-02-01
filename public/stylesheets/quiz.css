@@ -1,0 +1,333 @@
+/*
+=============== 
+Variables
+===============
+*/
+
+:root {
+	/* dark shades of primary color*/
+	--clr-primary-1: hsl(205, 86%, 17%);
+	--clr-primary-2: hsl(205, 77%, 27%);
+	--clr-primary-3: hsl(205, 72%, 37%);
+	--clr-primary-4: hsl(205, 63%, 48%);
+	/* primary/main color */
+	--clr-primary-5: hsl(205, 78%, 60%);
+	/* lighter shades of primary color */
+	--clr-primary-6: hsl(205, 89%, 70%);
+	--clr-primary-7: hsl(205, 90%, 76%);
+	--clr-primary-8: hsl(205, 86%, 81%);
+	--clr-primary-9: hsl(205, 90%, 88%);
+	--clr-primary-10: hsl(205, 100%, 96%);
+	/* darkest grey - used for headings */
+	--clr-grey-1: hsl(209, 61%, 16%);
+	--clr-grey-2: hsl(211, 39%, 23%);
+	--clr-grey-3: hsl(209, 34%, 30%);
+	--clr-grey-4: hsl(209, 28%, 39%);
+	/* grey used for paragraphs */
+	--clr-grey-5: hsl(210, 22%, 49%);
+	--clr-grey-6: hsl(209, 23%, 60%);
+	--clr-grey-7: hsl(211, 27%, 70%);
+	--clr-grey-8: hsl(210, 31%, 80%);
+	--clr-grey-9: hsl(212, 33%, 89%);
+	--clr-grey-10: hsl(210, 36%, 96%);
+	--clr-white: #fff;
+	--clr-red-dark: hsl(360, 67%, 44%);
+	--clr-red-light: hsl(360, 71%, 66%);
+	--clr-green-dark: hsl(125, 67%, 44%);
+	--clr-green-light: hsl(125, 71%, 66%);
+	--clr-black: #222;
+	--ff-primary: "Roboto", sans-serif;
+	--ff-secondary: "Poppins", sans-serif;
+	--transition: all 0.3s linear;
+	--spacing: 0.01rem;
+	--radius: 0.25rem;
+	--light-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+	--dark-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+	--max-width: 1170px;
+	--fixed-width: 620px;
+}
+/*
+=============== 
+Global Styles
+===============
+*/
+
+*,
+::after,
+::before {
+	letter-spacing: var(--spacing);
+}
+
+#guide,
+#quiz {
+	height: auto;
+	width: 300px;
+	padding: 10px;
+	background: #e7f1fa;
+	border-radius: 10px;
+}
+
+#guide h2 {
+	color: #ff2200;
+}
+
+#guide h4 {
+	line-height: 1.8;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	color: #222;
+	text-transform: capitalize;
+}
+
+#guide div#button {
+	height: 50px;
+	width: 100%;
+	display: flex;
+	justify-content: flex-end;
+}
+
+#guide div#button button {
+	height: 40px;
+	width: 90px;
+	margin: 10px;
+	outline: none;
+	background: #ff2200;
+	color: #fff;
+	border-radius: 20px 8px;
+	border: 2px solid #b0c4d8;
+	cursor: pointer;
+}
+
+#guide div#button button:hover {
+	background: #ff0000;
+}
+
+/* quiz section */
+
+#quiz {
+	height: 440px;
+	position: relative;
+}
+
+#quiz #quiz_header {
+	height: 60px;
+	width: 100%;
+	background: #fafafc;
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-radius: 10px;
+	padding: 0 20px;
+}
+
+#quiz #quiz_header h5 {
+	color: #ff5235;
+	font-size: 0.9rem;
+}
+
+#quiz #quiz_header #timer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 40px;
+	width: 150px;
+	background: #ff2000;
+	color: #e7f1fa;
+	border-radius: 25px 8px;
+	border: 1px solid #b0c4d8;
+}
+
+h6:not(#time) {
+	padding: 0 0 0 10px;
+}
+
+#quiz #quiz_header #timer h6#time {
+	padding: 0px 12px;
+	margin: 0 10px 0 0;
+	background: #fff;
+	color: #f69d9e;
+	border-radius: 15px 7px;
+	font-size: 1rem;
+	border: 1px solid #b0c4d8;
+}
+/* Quiz questions */
+
+#quiz #question {
+	position: absolute;
+	top: 85px;
+	display: flex;
+}
+
+#quiz #question h3:first-child {
+	margin: 0 10px 0 5px;
+}
+
+#quiz #optionList {
+	width: 100%;
+	position: absolute;
+	top: 150px;
+}
+
+#quiz #optionList h4 {
+	line-height: 2.3;
+	width: 93%;
+	background: #ff2200;
+	color: #000;
+	overflow: hidden;
+	margin: 10px 0px;
+	border-radius: 7px;
+	padding: 0 10px;
+	border: 1px solid #b0c4d8;
+	cursor: pointer;
+}
+
+#quiz #optionList h4:hover {
+	background: #ff0000;
+}
+#quiz #optionList .active {
+	background: #ff0000;
+}
+#quiz #optionList .disabled {
+	pointer-events: none;
+}
+
+/* Answer section */
+
+#quiz #answersSection {
+	height: 60px;
+	width: 100%;
+	background: #fafafc;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-radius: 30px 30px 30px 10px;
+}
+
+#quiz #answersSection h3 {
+	margin: 0px 20px;
+	font-size: 0.96rem;
+}
+
+#quiz #answersSection h3:first-child {
+	visibility: hidden;
+}
+
+#quiz #answersSection h3:last-child {
+	background: #e7f1fa;
+	color: #ff5235;
+	width: 100px;
+	text-align: center;
+	padding: 5px 0;
+	border-radius: 10px;
+	border: 3px solid #b0c4d8;
+	cursor: pointer;
+}
+
+#quiz #answersSection h3:last-child:hover {
+	background: #e91e3a;
+	color: #e7f1fa;
+}
+
+/* results */
+
+#container #result {
+	height: 400px;
+	width: 300px;
+	text-align: center;
+	background: #f6fbff;
+	border-radius: 10px;
+	position: relative;
+	word-wrap: break-word;
+	padding: 0 1rem; 
+}
+
+#container #result i {
+	font-size: 120px;
+	color: #e91e3a;
+	position: absolute;
+	top: 20px;
+	width: 100%;
+	display: grid;
+	place-items: center;
+}
+
+#container #result h6 {
+	width: 100%;
+	position: absolute;
+	top: 180px;
+	text-align: center;
+	font-size: 1.1rem;
+	left: 50%;
+	translate: -50%;
+}
+
+#container #result #points {
+	top: 280px;
+	color: #000;
+	left: 50%;
+	translate: -50%;
+}
+
+#container #result a:link, #container #result a:visited {
+	color: #ff2301ed;
+	font-size: 0.89rem;
+	letter-spacing: 0;
+	border-radius: 5px;
+	text-transform: capitalize;
+	position: absolute;
+	bottom: 20px;
+	left: 50%;
+	translate: -50%;
+	text-decoration: none;
+}
+
+#container #result a:hover {
+	color: #ff0000;
+}
+
+@media screen and (min-width: 450px) {
+	#guide,
+	#quiz, #container #result {
+		width: 480px;
+	}
+}
+
+@media screen and (min-width: 620px) {
+	h2 {
+		font-size: 2rem;
+	}
+
+	h5 {
+		font-size: 1.6rem !important;
+	}
+
+	#guide h4 {
+		line-height: 2;
+	}
+
+	#container #result h6 {
+		font-size: 1.2rem !important;
+	}
+
+	body {
+		font-size: 1.05rem;
+	}
+
+	#guide,
+	#quiz, #container #result {
+		width: 580px;
+		padding: 20px;
+		margin: 0;
+	}
+
+	button {
+		width: 200px !important;
+	}
+}

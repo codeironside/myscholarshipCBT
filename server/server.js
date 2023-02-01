@@ -4,6 +4,7 @@ const express = require("express");
 const connectDB = require("./config/db")
 const { errorHandler } = require("./middleware/errormiddleware.js");
 const ip = require('express-ip')
+const path=require('path')
 
 
 const sessions= require("./middleware/sessions")
@@ -21,6 +22,11 @@ app.use(ip().getIpInfoMiddleware)
 //logger
 app.use(morgan('tiny', { stream: logger.stream }));
 app.use(morgan('tiny', { stream: userlogger.stream }));
+
+
+//views
+app.set('view engine', 'ejs');
+app.use(express.static(path.join(__dirname,"../public")))
 // db
 connectDB()
 
@@ -32,6 +38,11 @@ app.use(express.urlencoded({ extended: false }));
 //router routes
 app.use(sessions)
 app.use("/user", require("./routes/user.js"))
+app.use("", require("./routes/user.js"))
+
+
+//Admin routes
+app.use("/user", require("./routes/Admin.js"))
 
 //error handler
 app.use(errorHandler);

@@ -23,20 +23,30 @@ const asyncHandler = require("express-async-handler");
 //@routes POST/api/staff
 //@access Public
 //updating mongoose with javascript?
+
+
+
+
+
+const home = asyncHandler(async(req,res)=>{
+
+  res.render("index")
+})
 const registerUser = asyncHandler(async (req, res) => {
+  console.log(req.body)
   const {
-    Surname,
-    FirstName,
+    lastName,
+    firstName,
     middleName,
     email,
-    Nationality,
-    SOG,
-    school,
+    country,
+    states,
+    institution,
     level,
     status,
     essay,
     password,
-    hearAbout,
+    information,
     gender,
     phonenumber,
   } = req.body;
@@ -323,11 +333,7 @@ const loginUser = asyncHandler(async (req, res) => {
           token: generateToken(User._id),
         });
         const userloc = req.ipInfo;
-        const ipinfo = new IPinfoWrapper(process.env.ipsecret);
-
-         console.log(ipinfo.lookupIp(userloc).then((data) => {
-          return data
-        }));
+    
 
        
         console.log(`User IP: ${userloc}`);
@@ -575,6 +581,7 @@ const Location = (userloc) => {
   });
 };
 module.exports = {
+  home,
   registerUser,
   loginUser,
   recoverPassword,

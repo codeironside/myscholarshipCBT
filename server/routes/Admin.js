@@ -6,13 +6,9 @@ const {
   loginUser,
   authenticatelogin,
   changepassword,
-  home,
 } = require("../controller/user");
 const Router = express.Router();
 
-
-//home 
-Router.route("").get(home)
 //registeration
 Router.route("/registration").post(registerUser);
 //login user
