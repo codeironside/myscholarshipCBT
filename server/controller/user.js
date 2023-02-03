@@ -57,7 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   // console.log(req.body);
-  if (!FirstName || !password || !email || !Surname) {
+  if (!firstName || !email || !lastName) {
     res.status(400);
     throw new Error("please add all fields");
   }
@@ -121,7 +121,7 @@ const registerUser = asyncHandler(async (req, res) => {
 </head>
 <body>
   <h1>Welcome to My MyscholarshipNG!</h1>
-  <p>hey ${FirstName} Thank you for signing up. We hope you enjoy using our app.</p>
+  <p>hey ${firstName} Thank you for signing up. We hope you enjoy using our app.</p>
   <a class="button" href="#">Explore the App</a>
 </body>
 </html>
@@ -134,40 +134,32 @@ const registerUser = asyncHandler(async (req, res) => {
     html: html,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      res.status(400);
-      console.log(error);
-      throw new Error("email not sent");
-    } else {
-      console.log("Email sent: " + info.response);
-      userlogger.info(
-        `Email sent : to ${email}  250 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`
-      );
-    }
-  });
 
   //send a welelcome email
   //hash the password
+  const pass ="bkbfdnbsdfbjbbfkbdbdbsk"
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+  const hashedPassword = await bcrypt.hash(pass, salt);
   console.log(hashedPassword);
   // //create user
+  const count = "Nigeria"
+  const gend  = "M"
+  const phone ="dsuhfdbdfb"
   const User = await USER.create({
-    Surname,
-    FirstName,
-    middleName,
+    Surname:lastName,
+    FirstName:firstName,
+    middleName:middleName,
     email,
-    Nationality,
-    SOG,
-    school,
-    level,
-    status,
+    Nationality:count,
+    SOG:states,
+    school:institution,
+    level:level,
+    status:"here",
     essay,
     password: hashedPassword,
-    hearAbout,
-    gender,
-    phonenumber,
+    hearAbout:information,
+    gender:gend,
+    phonenumber :phone,
     secret: secret.base32,
   });
   if (User) {
@@ -179,6 +171,19 @@ const registerUser = asyncHandler(async (req, res) => {
 
       // message: "email sent",
     });
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        res.status(400);
+        console.log(error);
+        throw new Error("email not sent");
+      } else {
+        console.log("Email sent: " + info.response);
+        userlogger.info(
+          `Email sent : to ${email}  250 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}-${info.response}`
+        );
+      }
+    });
+  
     userlogger.info(
       `user created :202 - ${res.statusMessage}  - ${req.originalUrl} - ${req.method} - ${req.ip}`
     );
